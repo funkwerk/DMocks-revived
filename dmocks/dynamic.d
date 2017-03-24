@@ -62,7 +62,15 @@ class DynamicT(T) : Dynamic
     ///
     override string toString()
     {
-        return _data.to!string();
+        alias DataType = typeof(_data);
+        static if (is(DataType == class) && !hasFunctionAttributes!(DataType.toString, "const"))
+        {
+            return (cast(Unqual!DataType) _data).toString();
+        }
+        else
+        {
+            return _data.to!string;
+        }
     }
 
     /// two dynamics are equal when they store same type and the values pass opEquals
@@ -163,4 +171,10 @@ version (DMocksTest) {
         d.get!D;
     }
     +/
+
+    // Compiles with a const object with the mutable toString.
+    unittest
+    {
+        auto d = dynamic(new const Object);
+    }
 }
