@@ -62,10 +62,9 @@ class DynamicT(T) : Dynamic
     ///
     override string toString()
     {
-        alias DataType = typeof(_data);
-        static if (is(DataType == class) && !hasFunctionAttributes!(DataType.toString, "const"))
+        static if (is(typeof(_data) == class) && !hasFunctionAttributes!(typeof(_data).toString, "const"))
         {
-            return (cast(Unqual!DataType) _data).toString();
+            return (cast(Unqual!(typeof(_data))) _data).toString();
         }
         else
         {
@@ -172,9 +171,10 @@ version (DMocksTest) {
     }
     +/
 
-    // Compiles with a const object with the mutable toString.
+    // supports const object with non-const toString
     unittest
     {
-        auto d = dynamic(new const Object);
+        static assert(is(typeof(dynamic(new const Object))));
+        static assert(is(typeof(dynamic(new immutable Object))));
     }
 }
