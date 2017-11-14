@@ -1,5 +1,7 @@
 module dmocks.object_mock;
 
+import core.vararg;
+
 import dmocks.util;
 import dmocks.repository;
 import dmocks.method_mock;
