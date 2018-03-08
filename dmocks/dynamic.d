@@ -35,6 +35,13 @@ T get(T)(Dynamic d)
     if (d.type == typeid(T))
         return ((cast(DynamicT!T)d).data());
     void[] convertResult = d.convertTo(typeid(T));
+
+    if (convertResult == null)
+    {
+        import std.format : format;
+        throw new Exception(format!"Cannot convert stored value of type '%s' to '%s'!"(d.type, T.stringof));
+    }
+
     return (cast(T*)convertResult)[0];
 }
 
@@ -98,6 +105,8 @@ class DynamicT(T) : Dynamic
     ///
     override void[] convertTo(TypeInfo to)
     {
+        import std.format : format;
+
         foreach(target;ImplicitConversionTargets!(T))
         {
             if (typeid(target) == to)
@@ -107,6 +116,7 @@ class DynamicT(T) : Dynamic
                 return ret;
             }
         }
+
         return null;
     }
 }
